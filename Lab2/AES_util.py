@@ -4,9 +4,6 @@ from Crypto.Random import get_random_bytes
 from InitialGenerator import InitialGenerator
 from Crypto.Util import Counter
 
-BS = 16
-pad5 = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
-unpad5 = lambda s : s[0:-ord(s[-1])]
 
 class AES_util():
     def __init__(self, init = None):
@@ -16,8 +13,7 @@ class AES_util():
             self.init = init
 
 
-    def encrypt(self, message, mode, key, init = None):
-        mode = self._mode(mode)
+    def encrypt(self, message, mode = AES.MODE_CBC, key, init = None):
         cipher = self._getCipher(mode, key, init)
         message = self._prepare_message(message, mode)
         return cipher.encrypt(message), self.init.getPrevious()
@@ -70,15 +66,3 @@ class AES_util():
             return AES.new(key, mode, counter = counter)
         else:
             raise Exception(f"Can't resolve: [{mode}].")
-
-
-    def _mode(self, mode):
-        mode = mode.upper()
-        encryptionModes = {
-            'CBC' : AES.MODE_CBC,
-            'CFB' : AES.MODE_CFB,
-            'OFB' : AES.MODE_OFB,
-            'CTR' : AES.MODE_CTR,
-            'EAX' : AES.MODE_EAX
-        }
-        return encryptionModes[mode]
